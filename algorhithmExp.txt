@@ -1,0 +1,137 @@
+Outputs:
+    * Least cost route from root node to all dest. nodes
+	- Inf. if no route available
+    * Cost from root node to dest. nodes for each path
+	- Cost from point to point on each path
+
+Sample Network
+    A 2-> B 3-> C
+
+    6	  2	1
+    |	  |	|
+    \/	  \/    \/
+
+    D <-1 E <-4 F
+
+Sample Output for Root=A
+    Node A
+    Dest.   Route		    Total Cost
+    A	    A->A(0)			0
+    B	    A->B(2)			2
+    C	    A->B(2) B->C(3)		5
+    D	    A->B(2) B->E(2) E->D(1)	5
+    E	    A->B(2) B->E(2)		4
+    F	    A->B(2) B->C(3) C->F(1)	6
+
+Step by step of Dijkstra
+
+Start at the root node.  Path cost from A->A = 0 always
+
+    A
+
+Confirmed:	Tenative:
+		A->A = 0
+
+Smallest path cost in the table is A->A = 0
+Move A->A = 0 to confirmed table and look at all neighbor nodes of A
+
+    A 1-> B
+    | \
+    2  6
+    |   \
+    C    D
+
+Confirmed:	Tenative:
+A->A = 0	A->B = 1
+		A->C = 2
+		A->D = 6
+
+Smallest path cost is A->B = 1 so move to confirmed table
+Search all neighbors of B
+
+    A 1-> B 2-> E
+    | \   |
+    |  \  2
+    |   \ |
+    C     D
+
+Confirmed:	Tenative:
+A->A = 0	A->C = 2
+A->B = 1	A->D = 6
+		A->B->D = 3
+		A->B->E = 4
+
+Smallest path is A->C = 2 so move to confirmed table
+Search all neighbors of C
+
+    A --> B --> E
+    | \   |
+    2  \  |
+    |   \ |
+    C 4-> D
+
+Confirmed:	Tenative:
+A->A = 0	A->C->D = 6
+A->B = 1	A->D = 6
+A->C = 2	A->B->D = 3
+		A->B->E = 4
+
+Smallest path is A->B->D = 3 move to confirmed
+Remove A->D and A->C->D from Tenative table
+Search neighbors of D
+
+    A 1-> B --> E
+    | \   |
+    |  11  2
+    |   \ |
+    C <-4 D
+
+A->B->D->C = 7 > A->C = 2 so Discard
+
+Confirmed:	Tenative:
+A->A = 0	A->B->E = 4
+A->B = 1	
+A->C = 2	
+A->B->D = 3	
+
+Move smallest path A->B->E = 4 to confirmed and search neighbors of E
+
+    A --> B --> E
+    | \   |
+    |  \  |
+    |   \ |
+    C <-- D
+
+Confirmed:	Tenative:
+A->A = 0	
+A->B = 1	
+A->C = 2	
+A->B->D = 3	
+A->B->E = 4
+
+E has no neighbors so we are done
+
+Simulation Implementation with above network:
+       
+	SOURCE
+     A	B  C  D  E
+    ---------------
+D A |0  3  2  11 X |  A <-3- -1-> B <-6- -2-> E  
+E B |1  0  X  5  6 |  /\\	  /\
+S C |2  X  0  4  X |  |  \        |
+T D |6  2  4  0  X |  2    11     5
+  E |X  2  X  X  X |	     \    
+    ----------------  2       6   2
+		      |        \  |
+		      \/        \ \/
+		      C <-4- -4-> D
+
+1. Assign root node as (0,0)
+2. Confirm Root node
+3. Read root nodes neighbors (0,j) -> Tenative
+4. Scan Tenative for any duplicate Dest. nodes with higher values in confirmed column and discard
+5. Scan Tenative for smallest route and move to confirmed
+6. Scan all neighbors of newly confirmed and add to tenative with total path cost
+7. Repeat from 6 until Tenative list is empty at this step
+
+

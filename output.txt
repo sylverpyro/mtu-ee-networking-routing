@@ -1,0 +1,8 @@
+
+FINAL ROUTE TABLE
+0  Cost : 0
+0 1  Cost : 1
+0 4 2  Cost : 5
+0 4 2 3  Cost : 7
+0 4  Cost : 2
+0 5  Cost : 2
